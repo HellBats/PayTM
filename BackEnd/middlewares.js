@@ -3,7 +3,6 @@ const {JWT_SECRET} = require('./config')
 
 const authMiddleWare = async (req,res,next) => {
     const authHeader = req.headers.authorization;
-    
     if(!authHeader || !authHeader.startsWith('Bearer ')) res.status(403).json({message:"Login Required"});
     const token = authHeader.split(' ')[1];
     jwt.verify(token,JWT_SECRET,async (err,decoded)=>{

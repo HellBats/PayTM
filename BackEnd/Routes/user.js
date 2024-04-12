@@ -43,7 +43,10 @@ userRouter.post('/sign-up',async (req,res)=>{
 });
 
 userRouter.get('/sign-in',async (req,res)=>{
-    const payload = req.body;
+    const payload = {
+        EmailId:req.query.Email,
+        Password:req.query.Password};
+    console.log(payload);
     const user_schema = zod_signup_schema.safeParse(
         payload
     );
@@ -65,9 +68,9 @@ userRouter.get('/sign-in',async (req,res)=>{
 
 
 userRouter.put('/update_profile',authMiddleWare,async (req,res)=>{
-    const payload = zod_update_schema.safeParse(req.body);
+    const payload = zod_update_schema.safeParse(payload);
     if(!payload.success) res.status(411).json({message:"wrong inputs"}); 
-    await User.findByIdAndUpdate(req.userId,req.body);
+    await User.findByIdAndUpdate(req.userId,payload);
     res.status(200).json({message:"Update Succesfull"});
 });
 
@@ -79,12 +82,12 @@ userRouter.get('/bulk',authMiddleWare,async (req,res)=>
         {
             $or:[{FirstName:{'$regex':req.query.filter}},{LastName:{'$regex':req.query.filter}}]
         });
-    res.json({user:users.map(user => ({
+    const users_array = users.map(user => ({
         FirstName:user.FirstName,
         LastName:user.LastName,
         _id:user._id
-    })
-    )});
+    }));
+    res.json({users:users_array});
     
 }); 
 

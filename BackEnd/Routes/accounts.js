@@ -8,17 +8,21 @@ const accountsRouter = express.Router();
 
 
 accountsRouter.get('/balance',authMiddleWare,async (req,res)=>{           
-    const account =  await Accounts.findOne({UserId:req.userId.userId});
+    const account =  await Accounts.findOne({UserId:req.userId});
     res.json({balance:account.Balance})
 })
 
+accountsRouter.get('/get-my-id',authMiddleWare,async (req,res)=>{           
+    const account =  await Accounts.findOne({UserId:req.userId});
+    res.json({user_id:account.UserId})
+})
 
 accountsRouter.post('/transfer',authMiddleWare,async (req,res)=>{
     const session = await mongoose.startSession();
     await session.startTransaction();
     const sender_account = await Accounts.findOne({UserId:req.userId}).session(session);
     const reciever_account = await Accounts.findOne({UserId:req.body.to}).session(session);
-    console.log(req.userId,req.body.to);
+    console.log(req.userId,req.body.amount,req.body.to);
     if(!reciever_account){
         await session.abortTransaction();
         res.status(400).json({message:"Invalid account"});
